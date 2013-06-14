@@ -69,18 +69,20 @@ function initialize() {
   var Coordinates = ["""
 
 for p in points:
-  sys.stdout.write("new google.maps.LatLng(%f, %f)," %(p[0],p[1]))
+	sys.stdout.write("new google.maps.LatLng(%f, %f)," %(p[0],p[1]))
 
 print """
   new google.maps.LatLng(44.174258, 5.279746)
   ];
-   var elevations = ["""
-for p in points:
-	sys.stdout.write('%d,' % p[2])
+  """
+#    var elevations = ["""
+# for p in points:
+# 	sys.stdout.write('%d,' % p[2])
+# print """
+#    ];
+
 
 print """
-   ];
-
    var Path = new google.maps.Polyline({
     path: Coordinates,
     strokeColor: '#FF0000',
@@ -98,28 +100,28 @@ print """
   data.addColumn('string', 'Afstand');
   data.addColumn('number', 'Dalen');
   data.addColumn('number', 'Stijgen')
-  for (var i = 0; i < 20; i++) {
-     data.addRow(['', null, elevations[i]]);
-  }
-  for (var i = 20; i < elevations.length-20; i++) {
-    var sumprev = 0;
-    var sumnext = 0;
-    for (var j=0; j <20; j++) {
-       sumprev += elevations[i-j]
-       sumnext += elevations[i+j]
-    }
-    var average_prev = sumprev/20;
-    var average_next = sumnext/20;
-    if (average_prev <= average_next) {
-       data.addRow(['', null, elevations[i]]);
-    } else {
-       data.addRow(['', elevations[i], null]);
-    }
-  }
-  for (var i = (elevations.length-20); i < elevations.length; i++) {
-     data.addRow(['', null, elevations[i]]);
-  }
+"""
 
+
+WINDOW = 20
+for i in range(WINDOW):
+    sys.stdout.write("data.addRow(['', null, %d]);" % points[i][2])
+for i in range(WINDOW, len(points)-WINDOW):
+    sumprev = 0
+    sumnext = 0
+    for j in range(WINDOW):
+        sumprev += points[i-j][2];
+        sumnext += points[i+j][2];
+    average_prev = sumprev/WINDOW
+    average_next = sumnext/WINDOW
+    if average_prev <= average_next:
+        sys.stdout.write("data.addRow(['',null,%d]);" % points[i][2])
+    else:
+        sys.stdout.write("data.addRow(['',%d,null]);" % points[i][2])
+for i in range(len(points)-WINDOW, len(points)):
+    sys.stdout.write("data.addRow(['', null, %d]);" % points[i][2])
+
+print """
   // Draw the chart using the data within its DIV.
   document.getElementById('elevation_chart').style.display = 'block';
   chart.draw(data, {
