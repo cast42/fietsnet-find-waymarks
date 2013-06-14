@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 import sys
-import gpolyencode
 import gpxpy
 import gpxpy.gpx
 
